@@ -6,6 +6,7 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -35,14 +36,17 @@ class UserResource extends Resource
                 ->maxLength(255),
             Forms\Components\TextInput::make('password')
                 ->password()
-                ->required()
                 ->minLength(8),
             Forms\Components\TextInput::make('role')
                 ->maxLength(255),
             Forms\Components\TextInput::make('trips_id')
                 ->numeric(),
-            Forms\Components\TextInput::make('avatar')
-                ->maxLength(255),
+                FileUpload::make('avatar') // Utilisez FileUpload pour les images
+                ->disk('public') // Spécifiez le disque où vous souhaitez stocker les fichiers
+                ->directory('avatars') // Spécifiez le répertoire où vous souhaitez stocker les fichiers
+                ->image() // Assurez-vous que seuls les fichiers image sont acceptés
+                ->preview() // Ajoute un aperçu de l'image
+                ->getUploadedFileNameForStorageDisk(fn ($state) => $state), // Utiliser le nom de fichier tel quel
         ]);
     }
 

@@ -39,7 +39,7 @@ class TripResource extends Resource
                     ->required()
                     ->numeric(),
                 Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'full_name') // Utilisez 'full_name' comme attribut dynamique
+                    ->relationship('user', 'firstname') // Utiliseirstname' comme attribut dynamique
                     ->required(),
             ]);
     }
@@ -53,7 +53,7 @@ class TripResource extends Resource
                 Tables\Columns\TextColumn::make('starting_at'),
                 Tables\Columns\TextColumn::make('available_places'),
                 Tables\Columns\TextColumn::make('price'),
-                Tables\Columns\TextColumn::make('user.full_name') // Affichage du nom complet de l'utilisateur
+                Tables\Columns\TextColumn::make('user.firstname') // Affichage du nom complet de l'utilisateur
                     ->label('User'), // Label pour la colonne
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(),

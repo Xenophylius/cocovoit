@@ -76,13 +76,23 @@ class UserController extends Controller
         $validated = $request->validate([
             'lastname' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
-            'email' => 'required|string|max:255',
-            'password' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'avatar' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048', // Validation de l'image
         ]);
 
         try {
             $validated['password'] = bcrypt($validated['password']); // Hash password
+
+            // Traitement de l'image
+            if ($request->hasFile('avatar')) {
+                $avatar = $request->file('avatar');
+                $avatarPath = $avatar->store('avatars', 'public'); // Enregistre dans storage/app/public/avatars
+                $validated['avatar'] = $avatarPath;
+            }
+
             $user = User::create($validated);
+
             return response()->json([
                 'message' => 'Utilisateur créé.',
                 'user' => $user
@@ -179,36 +189,48 @@ class UserController extends Controller
      * )
      */
     public function update(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'lastname' => 'sometimes|string|max:255',
-            'firstname' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'sometimes|string|min:8',
-            'role' => 'sometimes|string|max:255',
-            'trips_id' => 'nullable|integer',
-            'avatar' => 'nullable|string|max:255',
-        ]);
+{
+    $validated = $request->validate([
+        'lastname' => 'sometimes|string|max:255',
+        'firstname' => 'sometimes|string|max:255',
+        'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+        'password' => 'sometimes|string|min:8', // Assurez-vous que 'confirmed' est présent uniquement si le mot de passe est fourni
+        'role' => 'sometimes|string|max:255',
+        'trips_id' => 'nullable|integer',
+        'avatar' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
+    ]);
 
-        try {
-            $user = User::findOrFail($id);
+    try {
+        $user = User::findOrFail($id);
 
-            if (isset($validated['password'])) {
-                $validated['password'] = bcrypt($validated['password']); // Hash password
+        if (isset($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']); // Hash password
+        }
+
+        // Traitement de l'image
+        if ($request->hasFile('avatar')) {
+            // Supprimer l'ancienne image si elle existe
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
             }
 
-            $user->update($validated);
-
-            return response()->json([
-                'message' => 'Utilisateur mis à jour avec succès.',
-                'user' => $user
-            ], 200);
-        } catch (Throwable $e) {
-            return response()->json([
-                'error' => 'Une erreur est survenue: ' . $e->getMessage(),
-            ], 500);
+            $avatar = $request->file('avatar');
+            $avatarPath = $avatar->store('avatars', 'public'); // Enregistre dans storage/app/public/avatars
+            $validated['avatar'] = $avatarPath;
         }
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Utilisateur mis à jour avec succès.',
+            'user' => $user
+        ], 200);
+    } catch (Throwable $e) {
+        return response()->json([
+            'error' => 'Une erreur est survenue: ' . $e->getMessage(),
+        ], 500);
     }
+}
 
     /**
      * @OA\Delete(

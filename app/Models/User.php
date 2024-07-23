@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+
 
 /**
  * @OA\Schema(
@@ -80,5 +82,16 @@ class User extends Authenticatable implements HasName
     public function getFullNameAttribute(): string
     {
         return $this->firstname . ' ' . $this->lastname;
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        // Vérifiez si l'avatar est défini et si le fichier existe sur le disque
+        if ($this->avatar && Storage::disk('public')->exists($this->avatar)) {
+            return Storage::disk('public')->url($this->avatar);
+        }
+
+        // Retourner null ou une URL par défaut si l'avatar n'existe pas
+        return null;
     }
 }

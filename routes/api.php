@@ -3,9 +3,11 @@
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Middleware\CheckAdmin;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
