@@ -34,8 +34,8 @@ class Trip extends Model
         'user_id',
     ];
 
-    public function utilisateur(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id'); // Assurez-vous que 'user_id' est la clé étrangère correcte
     }
 }
