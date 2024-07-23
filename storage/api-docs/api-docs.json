@@ -1,0 +1,681 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000/api",
+            "description": "API server"
+        }
+    ],
+    "paths": {
+        "/trip": {
+            "get": {
+                "tags": [
+                    "Voyage"
+                ],
+                "summary": "Obtenir la liste des voyages",
+                "operationId": "cadf5c68469d51c35eaca2a49b49acb0",
+                "responses": {
+                    "200": {
+                        "description": "Liste des voyages récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Trip"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Voyage"
+                ],
+                "summary": "Créer un nouveau voyage",
+                "operationId": "881dc7b53d5d143c7d8440a15d4c06ab",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "starting_point",
+                                    "ending_point",
+                                    "starting_at",
+                                    "available_places",
+                                    "price",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "starting_point": {
+                                        "type": "string",
+                                        "example": "Paris"
+                                    },
+                                    "ending_point": {
+                                        "type": "string",
+                                        "example": "Londres"
+                                    },
+                                    "starting_at": {
+                                        "type": "string",
+                                        "example": "2024-08-01T10:00:00Z"
+                                    },
+                                    "available_places": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "price": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Voyage créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Trip"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/trip/{id}": {
+            "get": {
+                "tags": [
+                    "Voyage"
+                ],
+                "summary": "Obtenir un voyage par ID",
+                "operationId": "2110cc122ffe7d648ff3e141763b85b6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du voyage",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Voyage récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Trip"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Voyage non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Voyage"
+                ],
+                "summary": "Mettre à jour un voyage",
+                "operationId": "d3de21a63aca66d337bc467a52748e98",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du voyage",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "starting_point": {
+                                        "type": "string",
+                                        "example": "Paris"
+                                    },
+                                    "ending_point": {
+                                        "type": "string",
+                                        "example": "Londres"
+                                    },
+                                    "starting_at": {
+                                        "type": "string",
+                                        "example": "2024-08-01T10:00:00Z"
+                                    },
+                                    "available_places": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "price": {
+                                        "type": "integer",
+                                        "example": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Voyage mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Trip"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte"
+                    },
+                    "404": {
+                        "description": "Voyage non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Voyage"
+                ],
+                "summary": "Supprimer un voyage",
+                "operationId": "df8984a530e8a1ef6175f14251edd2f3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du voyage",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Voyage supprimé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Voyage supprimé avec succès."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Voyage non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "Utilisateur"
+                ],
+                "summary": "Obtenir la liste des utilisateurs",
+                "operationId": "23679253d16f34d2972249751e3631dd",
+                "responses": {
+                    "200": {
+                        "description": "Liste des utilisateurs récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Utilisateur"
+                ],
+                "summary": "Créer un nouvel utilisateur",
+                "operationId": "ce3cf31668a69eb39e5e98738715afa1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "lastname",
+                                    "firstname",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "lastname": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "firstname": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "tags": [
+                    "Utilisateur"
+                ],
+                "summary": "Obtenir un utilisateur par ID",
+                "operationId": "1ec60d4ee968175164a94c21f897f8ea",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Utilisateur"
+                ],
+                "summary": "Mettre à jour un utilisateur",
+                "operationId": "786a794071cb7098f55a4a4911e7d3f0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "lastname": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "firstname": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    },
+                                    "trips_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "avatar.png"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte"
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Utilisateur"
+                ],
+                "summary": "Supprimer un utilisateur",
+                "operationId": "a56b12a3694a926699892056cdcf8a9e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur supprimé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Utilisateur supprimé avec succès."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Trip": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "starting_point": {
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "ending_point": {
+                        "type": "string",
+                        "example": "Londres"
+                    },
+                    "starting_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-01T10:00:00Z"
+                    },
+                    "available_places": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "price": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-07-23T12:34:56Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-07-23T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "lastname": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "firstname": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john.doe@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "secret123"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "trips_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "example": "avatar.png"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-07-23T12:34:56Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-07-23T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Bearer token authentication",
+                "scheme": "bearer"
+            },
+            "bearerAuth": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Voyage",
+            "description": "Voyage"
+        },
+        {
+            "name": "Utilisateur",
+            "description": "Utilisateur"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
+}
