@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
@@ -26,8 +27,29 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::resource('trip', TripController::class)
     ->only(['index', 'store', 'update', 'destroy', 'show'])
     ->middleware(['auth:sanctum']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/rating', [RatingController::class, 'store']);
+        Route::get('/rating/{trip_id}', [RatingController::class, 'index']);
+    });
     
 Route::post('login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);  
+    $user = User::where('email', $request->email)->first();
+        
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+        
+    return response()->json([
+        'token' => $user->createToken('Token Name')->plainTextToken
+    ]);
+});
+
+Route::get('login', function (Request $request) {
     $request->validate([
         'email' => 'required|email',
         'password' => 'required',
@@ -46,3 +68,5 @@ Route::post('login', function (Request $request) {
 Route::get('/docs/api-docs.json', function () {
     return response()->file(storage_path('api-docs.json'));
 });
+
+Route::get('/trips', [TripController::class, 'search']);

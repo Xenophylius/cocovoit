@@ -6,6 +6,7 @@ use App\Filament\Resources\TripResource\Pages;
 use App\Filament\Resources\TripResource\RelationManagers;
 use App\Models\Trip;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -29,9 +30,8 @@ class TripResource extends Resource
                 Forms\Components\TextInput::make('ending_point')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('starting_at')
-                    ->required()
-                    ->maxLength(255),
+                DateTimePicker::make('starting_at')
+                    ->required(),
                 Forms\Components\TextInput::make('available_places')
                     ->required()
                     ->numeric(),

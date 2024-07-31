@@ -250,4 +250,72 @@ class TripController extends Controller
             ], 500);
         }
     }
+
+
+/**
+ * @OA\Get(
+ *     path="/api/trips",
+ *     summary="Rechercher des trajets",
+ *     tags={"Trips"},
+ *     @OA\Parameter(
+ *         name="start",
+ *         in="query",
+ *         description="Point de départ du trajet",
+ *         required=false,
+ *         @OA\Schema(type="string")
+ *     ),
+ *     @OA\Parameter(
+ *         name="end",
+ *         in="query",
+ *         description="Point d'arrivée du trajet",
+ *         required=false,
+ *         @OA\Schema(type="string")
+ *     ),
+ *     @OA\Parameter(
+ *         name="date",
+ *         in="query",
+ *         description="Date du trajet",
+ *         required=false,
+ *         @OA\Schema(type="string", format="date")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des trajets récupérée avec succès",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(ref="#/components/schemas/Trip")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Aucun trajet trouvé"
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Erreur serveur interne"
+ *     )
+ * )
+ */   
+    public function search(Request $request)
+    {
+        $start = $request->query('start');
+        $end = $request->query('end');
+        $date = $request->query('date');
+
+        $trips = Trip::query()
+            ->when($start, function ($query, $start) {
+                return $query->where('starting_point', 'like', '%' . $start . '%');
+            })
+            ->when($end, function ($query, $end) {
+                return $query->where('ending_point', 'like', '%' . $end . '%');
+            })
+            ->when($date, function ($query, $date) {
+                return $query->whereDate('starting_at', $date);
+            })
+            ->get();
+
+        return response()->json($trips);
+    }
+
+    
 }

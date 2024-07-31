@@ -11,6 +11,118 @@
         }
     ],
     "paths": {
+        "/rating": {
+            "post": {
+                "tags": [
+                    "Notation"
+                ],
+                "summary": "Noter un voyage",
+                "operationId": "abdaadda14312676e1da4b96afd9f227",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "trip_id",
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "trip_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "rating": {
+                                        "description": "Note entre 1 et 5",
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notation ajoutée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notation ajoutée avec succès."
+                                        },
+                                        "rating": {
+                                            "$ref": "#/components/schemas/Rating"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/rating/{trip_id}": {
+            "get": {
+                "tags": [
+                    "Notation"
+                ],
+                "summary": "Obtenir les notations pour un voyage",
+                "operationId": "98208b1140f5a1939e4aac0be2442326",
+                "parameters": [
+                    {
+                        "name": "trip_id",
+                        "in": "path",
+                        "description": "ID du voyage",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notations récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Rating"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Voyage non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/trip": {
             "get": {
                 "tags": [
@@ -283,6 +395,66 @@
                 ]
             }
         },
+        "/api/trips": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Rechercher des trajets",
+                "operationId": "9ffcbfef8d645c0f7505d3a50bf2b8af",
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Point de départ du trajet",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "end",
+                        "in": "query",
+                        "description": "Point d'arrivée du trajet",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Date du trajet",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des trajets récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Trip"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun trajet trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "tags": [
@@ -349,6 +521,11 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "secret123"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "example": "avatar.jpg"
                                     }
                                 },
                                 "type": "object"
@@ -463,12 +640,18 @@
                                         "type": "string",
                                         "example": "admin"
                                     },
-                                    "trips_id": {
-                                        "type": "integer",
-                                        "example": 1
+                                    "trip_id": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1
+                                        ]
                                     },
                                     "avatar": {
                                         "type": "string",
+                                        "format": "binary",
                                         "example": "avatar.png"
                                     }
                                 },
@@ -555,6 +738,41 @@
     },
     "components": {
         "schemas": {
+            "Rating": {
+                "required": [
+                    "user_id",
+                    "trip_id",
+                    "rating"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "trip_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "rating": {
+                        "description": "Note entre 1 et 5",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Trip": {
                 "properties": {
                     "id": {
@@ -567,34 +785,22 @@
                     },
                     "ending_point": {
                         "type": "string",
-                        "example": "Londres"
+                        "example": "Lyon"
                     },
-                    "starting_at": {
+                    "date": {
                         "type": "string",
-                        "format": "date-time",
-                        "example": "2024-08-01T10:00:00Z"
-                    },
-                    "available_places": {
-                        "type": "integer",
-                        "example": 10
-                    },
-                    "price": {
-                        "type": "integer",
-                        "example": 100
-                    },
-                    "user_id": {
-                        "type": "integer",
-                        "example": 1
+                        "format": "date",
+                        "example": "2024-08-01"
                     },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-07-23T12:34:56Z"
+                        "example": "2024-07-29T12:34:56Z"
                     },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-07-23T12:34:56Z"
+                        "example": "2024-07-29T12:34:56Z"
                     }
                 },
                 "type": "object"
@@ -665,8 +871,16 @@
     },
     "tags": [
         {
+            "name": "Notation",
+            "description": "Notation"
+        },
+        {
             "name": "Voyage",
             "description": "Voyage"
+        },
+        {
+            "name": "Trips",
+            "description": "Trips"
         },
         {
             "name": "Utilisateur",

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('lastname');
             $table->string('firstname');
             $table->string('role')->default('user');
-            $table->integer('trip_id')->default(0);
+            $table->json('trip_id')->nullable()->change();
             $table->string('avatar')->default('');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

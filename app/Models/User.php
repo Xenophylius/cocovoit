@@ -7,6 +7,7 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -74,6 +75,11 @@ class User extends Authenticatable implements HasName
         return $this->hasMany(Trip::class);
     }
 
+    public function trips(): BelongsToMany
+    {
+        return $this->belongsToMany(Trip::class, 'user_trip', 'user_id', 'trip_id');
+    }
+
     public function getFilamentName(): string
     {
         return "{$this->first_name} {$this->last_name}";
@@ -84,14 +90,8 @@ class User extends Authenticatable implements HasName
         return $this->firstname . ' ' . $this->lastname;
     }
 
-    public function getAvatarUrlAttribute()
-    {
-        // Vérifiez si l'avatar est défini et si le fichier existe sur le disque
-        if ($this->avatar && Storage::disk('public')->exists($this->avatar)) {
-            return Storage::disk('public')->url($this->avatar);
-        }
-
-        // Retourner null ou une URL par défaut si l'avatar n'existe pas
-        return null;
-    }
+    public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
 }

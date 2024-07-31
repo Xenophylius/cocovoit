@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 use OpenApi\Annotations as OA;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -53,7 +55,8 @@ class UserController extends Controller
      *             @OA\Property(property="lastname", type="string", example="Doe"),
      *             @OA\Property(property="firstname", type="string", example="John"),
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *             @OA\Property(property="password", type="string", format="password", example="secret123"),
+     *             @OA\Property(property="avatar", type="string", format="binary", example="avatar.jpg")
      *         ),
      *     ),
      *     @OA\Response(
@@ -77,7 +80,7 @@ class UserController extends Controller
             'lastname' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:5',
             'avatar' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048', // Validation de l'image
         ]);
 
@@ -165,8 +168,8 @@ class UserController extends Controller
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
      *             @OA\Property(property="password", type="string", format="password", example="secret123"),
      *             @OA\Property(property="role", type="string", example="admin"),
-     *             @OA\Property(property="trips_id", type="integer", example=1),
-     *             @OA\Property(property="avatar", type="string", example="avatar.png")
+     *             @OA\Property(property="trip_id", type="array", @OA\Items(type="integer"), example={1}), 
+     *             @OA\Property(property="avatar", type="string", format="binary", example="avatar.png") 
      *         ),
      *     ),
      *     @OA\Response(
@@ -189,48 +192,66 @@ class UserController extends Controller
      * )
      */
     public function update(Request $request, $id)
-{
-    $validated = $request->validate([
-        'lastname' => 'sometimes|string|max:255',
-        'firstname' => 'sometimes|string|max:255',
-        'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
-        'password' => 'sometimes|string|min:8', // Assurez-vous que 'confirmed' est présent uniquement si le mot de passe est fourni
-        'role' => 'sometimes|string|max:255',
-        'trips_id' => 'nullable|integer',
-        'avatar' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-    ]);
+    {
+        $validated = $request->validate([
+            'lastname' => 'sometimes|string|max:255',
+            'firstname' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'sometimes|string|min:8',
+            'role' => 'sometimes|string|max:255',
+            'trip_id' => 'sometimes|integer',
+            'avatar' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
+        ]);
 
-    try {
-        $user = User::findOrFail($id);
+        try {
+            $user = User::findOrFail($id);
 
-        if (isset($validated['password'])) {
-            $validated['password'] = bcrypt($validated['password']); // Hash password
-        }
+            // Log pour déboguer les données validées
+            Log::info('Données validées pour mise à jour:', $validated);
 
-        // Traitement de l'image
-        if ($request->hasFile('avatar')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+            if (isset($validated['password'])) {
+                $validated['password'] = bcrypt($validated['password']); // Hash password
             }
 
-            $avatar = $request->file('avatar');
-            $avatarPath = $avatar->store('avatars', 'public'); // Enregistre dans storage/app/public/avatars
-            $validated['avatar'] = $avatarPath;
+            if (isset($validated['trip_id'])) {
+                $currentTrips = json_decode($user->trip_id, true) ?? [];
+                $validated['trip_id'] = [$validated['trip_id']];
+                $validated['trip_id'] = array_merge($currentTrips, $validated['trip_id']);
+            } else {
+                $validated['trip_id'] = json_decode($user->trip_id, true) ?? [];
+            }
+
+            $validated['trip_id'] = json_encode($validated['trip_id']);
+
+            // Traitement de l'image
+            if ($request->hasFile('avatar')) {
+                // Supprimer l'ancienne image si elle existe
+                if ($user->avatar) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                $avatar = $request->file('avatar');
+                $avatarPath = $avatar->store('avatars', 'public'); // Enregistre dans storage/app/public/avatars
+                $validated['avatar'] = $avatarPath;
+            }
+
+            // Log pour vérifier l'état du modèle avant la mise à jour
+            Log::info('Utilisateur avant mise à jour:', $user->toArray());
+
+            $user->update($validated);
+
+            // Log pour vérifier l'état du modèle après la mise à jour
+            Log::info('Utilisateur après mise à jour:', $user->fresh()->toArray());
+            return response()->json([
+                'message' => 'Utilisateur mis à jour avec succès.',
+                'user' => $user
+            ], 200);
+        } catch (Throwable $e) {
+            return response()->json([
+                'error' => 'Une erreur est survenue: ' . $e->getMessage(),
+            ], 500);
         }
-
-        $user->update($validated);
-
-        return response()->json([
-            'message' => 'Utilisateur mis à jour avec succès.',
-            'user' => $user
-        ], 200);
-    } catch (Throwable $e) {
-        return response()->json([
-            'error' => 'Une erreur est survenue: ' . $e->getMessage(),
-        ], 500);
     }
-}
 
     /**
      * @OA\Delete(

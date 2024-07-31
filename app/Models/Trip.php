@@ -21,6 +21,46 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-07-23T12:34:56Z")
  * )
  */
+
+ /**
+ * @OA\Schema(
+ *     schema="Trip",
+ *     type="object",
+ *     @OA\Property(
+ *         property="id",
+ *         type="integer",
+ *         example=1
+ *     ),
+ *     @OA\Property(
+ *         property="starting_point",
+ *         type="string",
+ *         example="Paris"
+ *     ),
+ *     @OA\Property(
+ *         property="ending_point",
+ *         type="string",
+ *         example="Lyon"
+ *     ),
+ *     @OA\Property(
+ *         property="date",
+ *         type="string",
+ *         format="date",
+ *         example="2024-08-01"
+ *     ),
+ *     @OA\Property(
+ *         property="created_at",
+ *         type="string",
+ *         format="date-time",
+ *         example="2024-07-29T12:34:56Z"
+ *     ),
+ *     @OA\Property(
+ *         property="updated_at",
+ *         type="string",
+ *         format="date-time",
+ *         example="2024-07-29T12:34:56Z"
+ *     )
+ * )
+ */
 class Trip extends Model
 {
     use HasFactory;
@@ -38,4 +78,9 @@ class Trip extends Model
     {
         return $this->belongsTo(User::class, 'user_id'); // Assurez-vous que 'user_id' est la clé étrangère correcte
     }
+
+    public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
 }

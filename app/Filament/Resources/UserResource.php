@@ -10,6 +10,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -36,17 +37,21 @@ class UserResource extends Resource
                 ->maxLength(255),
             Forms\Components\TextInput::make('password')
                 ->password()
+                ->nullable()
                 ->minLength(8),
             Forms\Components\TextInput::make('role')
                 ->maxLength(255),
-            Forms\Components\TextInput::make('trips_id')
-                ->numeric(),
-                FileUpload::make('avatar') // Utilisez FileUpload pour les images
-                ->disk('public') // Spécifiez le disque où vous souhaitez stocker les fichiers
-                ->directory('avatars') // Spécifiez le répertoire où vous souhaitez stocker les fichiers
-                ->image() // Assurez-vous que seuls les fichiers image sont acceptés
-                ->preview() // Ajoute un aperçu de l'image
-                ->getUploadedFileNameForStorageDisk(fn ($state) => $state), // Utiliser le nom de fichier tel quel
+                Forms\Components\MultiSelect::make('trip_id')
+                ->relationship('trip', 'id') // Assurez-vous d'adapter ceci à votre relation réelle et au champ d'affichage
+                ->searchable() // Permet à l'utilisateur de rechercher des options
+                ->preload() // Précharge les options pour améliorer les performances
+                ->placeholder('Sélectionnez les trajets'), // Texte d’espace réservé
+                FileUpload::make('avatar')
+                    ->nullable()
+                    ->disk('public')
+                    ->directory('avatars')
+                    ->previewable() 
+                    ->image()
         ]);
     }
 
@@ -58,8 +63,14 @@ class UserResource extends Resource
             Tables\Columns\TextColumn::make('lastname'),
             Tables\Columns\TextColumn::make('email'),
             Tables\Columns\TextColumn::make('role'),
-            Tables\Columns\TextColumn::make('trips_id'),
-            Tables\Columns\TextColumn::make('avatar'),
+            Tables\Columns\TextColumn::make('trip_id')
+                ->formatStateUsing(fn ($state) => json_encode($state, JSON_PRETTY_PRINT))
+                ->label('Trips ID'), // Nom de la colonne
+                ImageColumn::make('avatar')
+                ->disk('public') // Spécifiez le disque
+                ->label('Avatar')
+                ->url(fn ($record) => url('storage/' . $record->avatar)) // Créez l'URL de l'image
+                ->defaultImageUrl(url('/storage/avatars/default.png')),
             Tables\Columns\TextColumn::make('created_at')
                 ->dateTime(),
             Tables\Columns\TextColumn::make('updated_at')
