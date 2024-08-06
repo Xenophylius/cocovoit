@@ -32,7 +32,7 @@ class TripController extends Controller
     public function index()
     {
         try {
-            $trips = Trip::all();
+            $trips = Trip::with('user')->get();
             return response()->json($trips);
         } catch (Throwable $e) {
             return response()->json([
@@ -129,7 +129,7 @@ class TripController extends Controller
     public function show($id)
     {
         try {
-            $trip = Trip::findOrFail($id);
+            $trip = Trip::with('user')->findOrFail($id);
             return response()->json($trip, 200);
         } catch (Throwable $e) {
             return response()->json([

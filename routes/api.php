@@ -16,17 +16,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('user', [UserController::class, 'store']);
-Route::middleware('auth:sanctum')->group(function () {
+
     Route::get('user', [UserController::class, 'index']);
     Route::get('user/{user}', [UserController::class, 'show']);
     Route::put('user/{user}', [UserController::class, 'update']);
     Route::delete('user/{user}', [UserController::class, 'destroy']);
-});
+
     
     
 Route::resource('trip', TripController::class)
-    ->only(['index', 'store', 'update', 'destroy', 'show'])
-    ->middleware(['auth:sanctum']);
+    ->only(['index', 'store', 'update', 'destroy', 'show']);
+    
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/rating', [RatingController::class, 'store']);
@@ -45,7 +45,8 @@ Route::post('login', function (Request $request) {
     }
         
     return response()->json([
-        'token' => $user->createToken('Token Name')->plainTextToken
+        'token' => $user->createToken('Token Name')->plainTextToken,
+        'userId' => $user->id
     ]);
 });
 
