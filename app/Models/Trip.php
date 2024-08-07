@@ -74,6 +74,10 @@ class Trip extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'participate' => 'array',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id'); // Assurez-vous que 'user_id' est la clé étrangère correcte
@@ -82,5 +86,15 @@ class Trip extends Model
     public function ratings()
 {
     return $this->hasMany(Rating::class);
+}
+
+public function getParticipateAttribute($value)
+{
+    return $value ? json_decode($value, true) : [];
+}
+
+public function setParticipateAttribute($value)
+{
+    $this->attributes['participate'] = json_encode($value);
 }
 }

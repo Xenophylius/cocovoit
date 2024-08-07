@@ -317,5 +317,30 @@ class TripController extends Controller
         return response()->json($trips);
     }
 
+
+    public function reserve(Request $request, $id)
+    {
+        $userId = $request->input('userId');
     
+        try {
+            $trip = Trip::findOrFail($id);
+            $participate = $trip->participate ?? [];
+    
+            if (in_array($userId, $participate)) {
+                return response()->json(['message' => 'Vous avez déjà réservé ce trajet.'], 400);
+            }
+    
+            if (count($participate) >= $trip->available_places) {
+                return response()->json(['message' => 'Il n\'y a plus de places disponibles.'], 400);
+            }
+    
+            $participate[] = $userId;
+            $trip->participate = $participate;
+            $trip->save();
+    
+            return response()->json(['message' => 'Réservation effectuée avec succès.', 'trip' => $trip], 200);
+        } catch (Throwable $e) {
+            return response()->json(['error' => 'Une erreur est survenue: ' . $e->getMessage()], 500);
+        }
+    }
 }

@@ -71,3 +71,5 @@ Route::get('/docs/api-docs.json', function () {
 });
 
 Route::get('/trips', [TripController::class, 'search']);
+
+Route::post('/trip/{id}/reserve', [TripController::class, 'reserve']);
